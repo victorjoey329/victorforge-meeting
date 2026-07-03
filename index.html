@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VictorForge · 会议纪要</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="overrides.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#"><span class="brand-mark">V</span><span><b>VictorForge</b><small>Meeting Workspace</small></span></a>
+    <nav><a href="#">工作台</a><a class="active" href="#">会议纪要</a></nav>
+    <div class="avatar">李</div>
+  </header>
+
+  <main class="shell">
+    <button class="back">‹ 返回列表</button>
+    <section class="heading">
+      <span class="eyebrow">MEETING NOTE</span>
+      <h1>新建会议</h1>
+      <p>录下讨论，实时生成文字稿，并将会议内容保存到本机。</p>
+    </section>
+
+    <div class="tabs" role="tablist">
+      <button data-tab="upload">⇧ <span>上传录音</span></button>
+      <button class="selected" data-tab="record">◉ <span>实时录音</span></button>
+      <button data-tab="paste">T <span>粘贴文本</span></button>
+    </div>
+
+    <section class="form-card">
+      <label>会议标题</label>
+      <input id="title" placeholder="默认按时间生成" />
+      <label>关联项目 <em>可选</em></label>
+      <select id="project"><option value="">不关联，后续可修改</option><option>锐达项目</option><option>内部产品实验</option></select>
+    </section>
+
+    <section id="recordPanel" class="workspace panel-active">
+      <article class="record-card">
+        <div class="live-pill"><i></i><span id="stateText">准备录音</span></div>
+        <button id="recordButton" class="record-button" aria-label="开始录音"><span class="mic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="13" rx="4"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"></path></svg></span></button>
+        <div id="timer" class="timer">00:00</div>
+        <p id="recordHint">点击麦克风开始录音</p>
+        <div class="record-actions">
+          <button id="pauseButton" class="secondary" disabled>暂停</button>
+          <button id="stopButton" class="danger" disabled>结束录音</button>
+        </div>
+      </article>
+
+      <article class="transcript-card">
+        <div class="card-title"><div><span class="spark">✦</span><b>实时文字稿</b></div><span id="wordCount">0 字</span></div>
+        <div id="emptyState" class="empty"><span>〽</span><p>开始录音后，识别到的内容会出现在这里</p></div>
+        <textarea id="transcript" aria-label="会议文字稿" placeholder="文字稿将在这里生成，也可以直接编辑……"></textarea>
+      </article>
+    </section>
+
+    <section id="uploadPanel" class="single-panel">
+      <label class="dropzone"><input id="audioFile" type="file" accept="audio/*" /><span class="drop-icon">⇧</span><b>选择或拖入录音文件</b><small>支持 mp3、m4a、wav、webm</small></label>
+      <p class="notice">录音上传已就绪；服务端转写引擎将在下一阶段接入。</p>
+    </section>
+
+    <section id="pastePanel" class="single-panel">
+      <textarea id="pasteText" class="paste-box" placeholder="把已有的会议文字粘贴到这里……"></textarea>
+      <button id="usePaste" class="primary compact">使用这段文字</button>
+    </section>
+
+    <footer class="footer-actions">
+      <span id="saveStatus">内容仅保存在当前浏览器</span>
+      <div><button id="clearButton" class="secondary">清空</button><button id="saveButton" class="primary">保存会议</button></div>
+    </footer>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+name: Deploy Meeting Workspace
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: meeting-production-deploy
+  cancel-in-progress: true
+
+env:
+  SERVER_HOST: 82.156.238.108
+  SERVER_USER: ubuntu
+  SERVER_PORT: 22
+  APP_DIR: /home/ubuntu/apps/victorforge-meeting
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, macOS, ARM64, mac-deploy]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure SSH
+        env:
+          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SERVER_SSH_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$SERVER_HOST ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPBEaAZZ0G+RjFZkU+hUqabVt8LqrUNq1OxAsJb+J0nf" > ~/.ssh/known_hosts
+
+      - name: Upload project
+        run: |
+          tar --exclude='.git' -czf /tmp/victorforge-meeting.tar.gz .
+          scp -P "$SERVER_PORT" /tmp/victorforge-meeting.tar.gz "$SERVER_USER@$SERVER_HOST:/tmp/victorforge-meeting.tar.gz"
+
+      - name: Build and deploy
+        run: |
+          ssh -p "$SERVER_PORT" "$SERVER_USER@$SERVER_HOST" "APP_DIR='$APP_DIR' bash -s" <<'EOF'
+            set -e
+            mkdir -p "$APP_DIR"
+            tar -xzf /tmp/victorforge-meeting.tar.gz -C "$APP_DIR"
+            cd "$APP_DIR"
+            sudo docker compose up -d --build --remove-orphans
+            sudo docker compose ps
+            rm -f /tmp/victorforge-meeting.tar.gz
+          EOF

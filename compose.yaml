@@ -1,0 +1,7 @@
+services:
+  meeting:
+    build: .
+    container_name: victorforge-meeting
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
