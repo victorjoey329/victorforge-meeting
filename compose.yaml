@@ -4,4 +4,14 @@ services:
     container_name: victorforge-meeting
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
+
+  gateway:
+    image: nginx:alpine
+    container_name: victorforge-gateway
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - meeting
